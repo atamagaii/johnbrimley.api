@@ -5,10 +5,7 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
-- task: CmdLine@2
-  inputs:
-    script: 'ls'
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
-    projects: './johnbrimley.pia.csproj'
+    projects: 'johnbrimley.pia.csproj'
