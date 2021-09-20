@@ -22,16 +22,31 @@ namespace johnbrimley.api
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             new HostBuilder()
+                .ConfigureAppConfiguration((hostBuilderContext, configurationBuilder) =>
+                {
+                    if (hostBuilderContext.HostingEnvironment.IsDevelopment())
+                    {
+                        configurationBuilder
+                            .AddUserSecrets<Program>()
+                            .SetBasePath(hostBuilderContext.HostingEnvironment.ContentRootPath)
+                            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                            .AddJsonFile($"appsettings.{hostBuilderContext.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+                            .AddEnvironmentVariables();
+                    }
+                })
                 .ConfigureWebHost(webHostBuilder =>
                     webHostBuilder
                         .Configure((webHostBuilderContext, applicationBuilder) =>
                             applicationBuilder
                                 .UseRouting()
+                                .UseSwagger()
+                                .UseSwaggerUI(swaggerUIOptions => swaggerUIOptions.SwaggerEndpoint("/swagger/v1/swagger.json", "v1"))
                                 .UseEndpoints(endpoints => endpoints.MapDefaultControllerRoute())
                         )
                         .ConfigureServices(serviceCollection =>
                             serviceCollection
                                 .AddRouting()
+                                .AddSwaggerGen()
                                 .AddControllers()
                         )
                         .UseKestrel()
